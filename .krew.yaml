@@ -1,0 +1,59 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: lvman
+spec:
+  version: {{ .TagName }}
+  homepage: https://github.com/achernov3/kubectl-lvman
+  shortDescription: "Plugin for managing topolvm logicalvolumes resources"
+  description: |
+    This plugin show disk usage mounted volumes to pods via PersistentVolumeClaims. And shows oprhaned logicalvolumes which hasn't PersistentVolumes.
+  caveats: |
+    * This plugin needs SSH access to nodes
+    * Nodes need to have 'df' command
+    * User need to have access to delete resource logicalvolumes
+  platforms:
+  - selector:
+      matchLabels:
+        os: linux
+        arch: amd64
+    {{addURIAndSha "https://github.com/achernov3/kubectl-lvman/releases/download/{{ .TagName }}/kubectl-lvman-linux-amd64.tar.gz" .TagName }}
+    bin: kubectl-lvman
+    files:
+      - from: kubectl-lvman-linux-amd64
+        to: kubectl-lvman
+      - from: LICENSE
+        to: .
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm64
+    {{addURIAndSha "https://github.com/achernov3/kubectl-lvman/releases/download/{{ .TagName }}/kubectl-lvman-linux-arm64.tar.gz" .TagName }}
+    bin: kubectl-lvman
+    files:
+      - from: kubectl-lvman-linux-arm64
+        to: kubectl-lvman
+      - from: LICENSE
+        to: .
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: amd64
+    {{addURIAndSha "https://github.com/achernov3/kubectl-lvman/releases/download/{{ .TagName }}/kubectl-lvman-darwin-amd64.tar.gz" .TagName }}
+    bin: kubectl-lvman
+    files:
+      - from: kubectl-lvman-darwin-amd64
+        to: kubectl-lvman
+      - from: LICENSE
+        to: .
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: arm64
+    {{addURIAndSha "https://github.com/achernov3/kubectl-lvman/releases/download/{{ .TagName }}/kubectl-lvman-darwin-arm64.tar.gz" .TagName }}
+    bin: kubectl-lvman
+    files:
+      - from: kubectl-lvman-darwin-arm64
+        to: kubectl-lvman
+      - from: LICENSE
+        to: .
