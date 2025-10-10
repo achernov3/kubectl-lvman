@@ -1,6 +1,6 @@
 module kubectl-lvman
 
-go 1.25.0
+go 1.25
 
 require (
 	github.com/pabateman/kubectl-nsenter v1.2.1
