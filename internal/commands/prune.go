@@ -4,26 +4,32 @@ import (
 	"fmt"
 	"kubectl-lvman/internal/config"
 	"kubectl-lvman/internal/k8s"
-	"kubectl-lvman/internal/table"
 	"slices"
 
 	"github.com/urfave/cli/v2"
 )
 
 var (
-	orphan = &cli.Command{
-		Name:    config.CmdOrphan,
-		Aliases: []string{config.CmdOrphanShort},
-		Usage:   "prints oprhaned logical volumes and the nodes on which they are located",
+	Prune = &cli.Command{
+		Name:    config.CmdPrune,
+		Aliases: []string{config.CmdPruneShort},
+		Usage:   "",
+		Subcommands: []*cli.Command{
+			lost,
+		},
+	}
+
+	lost = &cli.Command{
+		Name:    config.CmdLost,
+		Aliases: []string{config.CmdLostShort},
 		Flags:   config.OrphanFlags,
-		Action:  showOrphan,
+		Usage:   "prune all losted LV (which hasn't binded PV)",
+		Action:  rmOrphan,
 	}
 )
 
-func showOrphan(clictx *cli.Context) error {
+func rmOrphan(clictx *cli.Context) error {
 	var pvs []string
-	var tableData [][]string
-	tableRender := table.GetTableRender()
 
 	cfg, err := config.NewConfig(clictx)
 	if err != nil {
@@ -53,13 +59,12 @@ func showOrphan(clictx *cli.Context) error {
 		lvName := lv.GetName()
 
 		if !slices.Contains(pvs, lvName) {
-			tableData = append(tableData, []string{lvName, lv.Spec.NodeName, lv.Status.VolumeID})
+			err = client.DeleteLV(lvName, clictx.Context)
+			if err != nil {
+				return fmt.Errorf("failed to delete LogicalVolume %v: %w", lvName, err)
+			}
 		}
-
 	}
 
-	tableRender.RenderTable(tableData, []string{"LogicalVolume", "NODE", "VOLUME ID"})
-
 	return nil
-
 }

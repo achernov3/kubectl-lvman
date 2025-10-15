@@ -18,10 +18,15 @@ const (
 )
 
 const (
-	CmdDF     = "df"
-	CmdShow   = "show"
-	CmdOrphan = "orphan"
-	CmdPrune  = "prune"
+	CmdDF          = "df"
+	CmdShow        = "show"
+	CmdShowShort   = "s"
+	CmdOrphan      = "orphan"
+	CmdOrphanShort = "o"
+	CmdPrune       = "prune"
+	CmdPruneShort  = "p"
+	CmdLost        = "lost"
+	CmdLostShort   = "l"
 )
 
 var (
@@ -103,7 +108,7 @@ type Config struct {
 
 func NewConfig(clictx *cli.Context) (*Config, error) {
 	pvcName := clictx.Args().Slice()
-	if clictx.Command.Name != CmdOrphan {
+	if clictx.Command.Name == CmdDF {
 		if len(pvcName) == 0 {
 			return nil, errorWithCliHelp(clictx, "you must specify pvc name!")
 		}

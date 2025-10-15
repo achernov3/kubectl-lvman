@@ -38,6 +38,7 @@ func main() {
 		HideHelpCommand:        true,
 		Commands: []*cli.Command{
 			commands.Show,
+			commands.Prune,
 		},
 	}
 

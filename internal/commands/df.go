@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"fmt"
 	"kubectl-lvman/internal/config"
 	diskfree "kubectl-lvman/internal/disk_free"
@@ -27,7 +26,6 @@ var (
 func showDiskFree(clictx *cli.Context) error {
 	var tableData [][]string
 	tableRender := table.GetTableRender()
-	ctx := context.Background()
 
 	cfg, err := config.NewConfig(clictx)
 	if err != nil {
@@ -40,12 +38,12 @@ func showDiskFree(clictx *cli.Context) error {
 	}
 
 	for _, pvcName := range cfg.PVCNames {
-		pvc, err := client.GetPVC(cfg.Namespace, pvcName, ctx)
+		pvc, err := client.GetPVC(cfg.Namespace, pvcName, clictx.Context)
 		if err != nil {
 			return fmt.Errorf("can't get resource *PersistentVolumeClaim: %w", err)
 		}
 
-		pv, err := client.GetPV(pvc.Spec.VolumeName, ctx)
+		pv, err := client.GetPV(pvc.Spec.VolumeName, clictx.Context)
 		if err != nil {
 			return fmt.Errorf("can't get resource *PersistentVolume: %w", err)
 		}
@@ -57,7 +55,7 @@ func showDiskFree(clictx *cli.Context) error {
 			return fmt.Errorf("PV %s has no node affinity configuration", pv.Name)
 		}
 
-		node, err := client.GetNode(pv.Spec.NodeAffinity.Required.NodeSelectorTerms[0].MatchExpressions[0].Values[0], ctx)
+		node, err := client.GetNode(pv.Spec.NodeAffinity.Required.NodeSelectorTerms[0].MatchExpressions[0].Values[0], clictx.Context)
 		if err != nil {
 			return fmt.Errorf("can't get resource *Node: %w", err)
 		}

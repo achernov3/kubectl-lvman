@@ -9,7 +9,7 @@ import (
 var (
 	Show = &cli.Command{
 		Name:    config.CmdShow,
-		Aliases: []string{"s"},
+		Aliases: []string{config.CmdShowShort},
 		Usage:   "",
 		Subcommands: []*cli.Command{
 			diskFree,
