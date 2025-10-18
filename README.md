@@ -31,5 +31,5 @@ pvc-048c5228-ccf5-4eaf-9df2-1dfabe5d629a  afd1fea-w-053    c2681c40-7da2-471d-8e
 ```
 
 ## TODO:
-  - [ ] bump urfave/cli to v3
+  - [x] bump urfave/cli to v3
   - [ ] add validate LV version
