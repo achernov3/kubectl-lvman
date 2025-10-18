@@ -72,7 +72,7 @@ func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 			}
 		}
 
-		cmd := fmt.Sprintf(`df -hP | grep "%s" | awk '
+		dfCmd := fmt.Sprintf(`df -hP | grep "%s" | awk '
 			BEGIN {
 			    printf "{\"discarray\":["
 			}
@@ -86,7 +86,7 @@ func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 			    print "]}"
 			}'`, pv.Spec.CSI.VolumeHandle)
 
-		stdout, err := sshclient.ExecCMD(cfg, cmd, host)
+		stdout, err := sshclient.ExecCMD(cfg, dfCmd, host)
 		if err != nil {
 			return fmt.Errorf("df command exit with non zero: %w", err)
 		}

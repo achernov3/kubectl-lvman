@@ -32,5 +32,6 @@ pvc-048c5228-ccf5-4eaf-9df2-1dfabe5d629a  afd1fea-w-053    c2681c40-7da2-471d-8e
 
 ## TODO:
   - [x] bump urfave/cli to v3
-  - [ ] refactor commands
+  - [x] refactor commands
+  - [ ] impliment `HostKeyCallback`
   - [ ] add validate LV version
