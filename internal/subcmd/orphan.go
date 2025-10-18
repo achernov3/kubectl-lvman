@@ -16,8 +16,13 @@ var (
 		Name:    config.CmdOrphan,
 		Aliases: []string{config.CmdOrphanShort},
 		Usage:   "prints oprhaned logical volumes and the nodes on which they are located",
-		Flags:   config.OrphanFlags,
-		Action:  showOrphan,
+		Flags: []cli.Flag{
+			config.KubeConfigFlag[0],
+			config.KubeContextFlag[0],
+			config.KubeNamespaceFlag[0],
+		},
+		Action:    showOrphan,
+		UsageText: fmt.Sprintf(`%s %s %s [flags] [command]`, config.AppName, config.CmdShow, config.CmdOrphan),
 	}
 )
 

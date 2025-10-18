@@ -17,14 +17,22 @@ var (
 	DF = &cli.Command{
 		Name:  config.CmdDF,
 		Usage: "prints disk usage to stdout and other info about pvc, pv, lv",
-		Flags: config.ShowFlags,
+		Flags: []cli.Flag{
+			config.KubeConfigFlag[0],
+			config.KubeContextFlag[0],
+			config.KubeNamespaceFlag[0],
+			config.IDRsaFlag[0],
+			config.PortFlag[0],
+			config.UsernameFlag[0],
+		},
 		Before: func(ctx context.Context, c *cli.Command) (context.Context, error) {
 			if c.Name == config.CmdDF && len(c.Args().Slice()) == 0 {
 				return nil, fmt.Errorf("you must specify pvc names!")
 			}
 			return nil, nil
 		},
-		Action: showDiskFree,
+		UsageText: fmt.Sprintf(`%s %s %s [flags] [command] <pvc-list>`, config.AppName, config.CmdShow, config.CmdDF),
+		Action:    showDiskFree,
 	}
 )
 

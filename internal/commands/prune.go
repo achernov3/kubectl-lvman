@@ -14,9 +14,13 @@ var (
 	Prune = &cli.Command{
 		Name:    config.CmdPrune,
 		Aliases: []string{config.CmdPruneShort},
-		Usage:   "prune all losted LV (which hasn't binded PV)",
+		Usage:   "prune all oprhaned LV (which hasn't binded PV)",
 		Action:  pruneOrphan,
-		Flags:   config.OrphanFlags,
+		Flags: []cli.Flag{
+			config.KubeConfigFlag[0],
+			config.KubeContextFlag[0],
+			config.KubeNamespaceFlag[0],
+		},
 	}
 )
 

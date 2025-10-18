@@ -19,6 +19,7 @@ func ExecCMD(cfg *config.Config, cmd, host string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("parsing private key: %w", err)
 	}
+
 	sshConfig := &ssh.ClientConfig{
 		User: cfg.Username,
 		Auth: []ssh.AuthMethod{

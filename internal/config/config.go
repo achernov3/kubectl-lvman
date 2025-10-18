@@ -19,6 +19,7 @@ const (
 )
 
 const (
+	AppName        = "kubectl-lvman"
 	CmdDF          = "df"
 	CmdShow        = "show"
 	CmdShowShort   = "s"
@@ -26,17 +27,18 @@ const (
 	CmdOrphanShort = "o"
 	CmdPrune       = "prune"
 	CmdPruneShort  = "p"
-	CmdLost        = "lost"
-	CmdLostShort   = "l"
+	CmdRemove      = "remove"
+	CmdRemoveShort = "r"
 )
 
 var (
 	ShowOrphanHeaders = []string{"LOGICAL VOLUME", "NODE", "VOLUME ID"}
 	StandardHeader    = []string{"PVC", "PV", "STATUS", "NODE", "VOLUME ID", "CAPACITY", "USAGE"}
+	KnowHosts         = fmt.Sprintf("%s/.ssh/known_hosts", homedir.HomeDir())
 )
 
 var (
-	ShowFlags = []cli.Flag{
+	KubeConfigFlag = []cli.Flag{
 		&cli.StringFlag{
 			Name:        argKubeconfig,
 			Usage:       "kubernetes client config path",
@@ -45,6 +47,9 @@ var (
 			Validator:   validateStringFlagsNonEmpty,
 			DefaultText: "$HOME/.kube/config",
 		},
+	}
+
+	KubeNamespaceFlag = []cli.Flag{
 		&cli.StringFlag{
 			Name:      argNamespace,
 			Aliases:   []string{"n"},
@@ -52,12 +57,18 @@ var (
 			Value:     "",
 			Validator: validateStringFlagsNonEmpty,
 		},
+	}
+
+	KubeContextFlag = []cli.Flag{
 		&cli.StringFlag{
 			Name:      argContext,
 			Usage:     "override current context from kubeconfig",
 			Value:     "",
 			Validator: validateStringFlagsNonEmpty,
 		},
+	}
+
+	IDRsaFlag = []cli.Flag{
 		&cli.StringFlag{
 			Name:        argIdRsa,
 			Usage:       "Path to private ssh key",
@@ -65,48 +76,24 @@ var (
 			Validator:   validateStringFlagsNonEmpty,
 			DefaultText: "$HOME/.ssh/id_rsa",
 		},
+	}
+
+	UsernameFlag = []cli.Flag{
 		&cli.StringFlag{
 			Name:      argUsername,
 			Usage:     "Paste username for ssh to node",
 			Value:     "ops",
 			Validator: validateStringFlagsNonEmpty,
 		},
+	}
+
+	PortFlag = []cli.Flag{
 		&cli.StringFlag{
 			Name:      argPort,
 			Usage:     "Paste port for ssh connection",
 			Value:     "22",
 			Validator: validateStringFlagsNonEmpty,
-		},
-	}
-
-	OrphanFlags = []cli.Flag{
-		&cli.StringFlag{
-			Name:        argKubeconfig,
-			Usage:       "kubernetes client config path",
-			Sources:     cli.EnvVars("KUBECONFIG"),
-			Value:       fmt.Sprintf("%s/.kube/config", homedir.HomeDir()),
-			Validator:   validateStringFlagsNonEmpty,
-			DefaultText: "$HOME/.kube/config",
-		},
-		&cli.StringFlag{
-			Name:      argNamespace,
-			Aliases:   []string{"n"},
-			Usage:     "override namespace of current context from kubeconfig",
-			Value:     "",
-			Validator: validateStringFlagsNonEmpty,
-		},
-		&cli.StringFlag{
-			Name:      argContext,
-			Usage:     "override current context from kubeconfig",
-			Value:     "",
-			Validator: validateStringFlagsNonEmpty,
-		},
-		&cli.BoolFlag{
-			Name:    ArgFormat,
-			Aliases: []string{"r"},
-			Usage:   "allows show stdout in raw format",
-		},
-	}
+		}}
 )
 
 type Config struct {

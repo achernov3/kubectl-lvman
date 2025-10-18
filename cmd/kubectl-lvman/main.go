@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"kubectl-lvman/internal/commands"
+	"kubectl-lvman/internal/config"
 	"os"
 	"time"
 
@@ -12,21 +13,20 @@ import (
 
 var Version = "local"
 
-const appName = "kubectl-lvman"
-
 func main() {
 	app := &cli.Command{
-		Name:                   appName,
+		Name:                   config.AppName,
 		Version:                Version,
 		Metadata:               map[string]interface{}{"Compiled:": time.Now()},
 		Usage:                  "kubectl plugin for managing logical volumes in a kubernetes cluster with topolvm as storage class",
-		UsageText:              fmt.Sprintf(`%s [flags] [command]`, appName),
+		UsageText:              fmt.Sprintf(`%s [flags] [command]`, config.AppName),
 		UseShortOptionHandling: true,
 		EnableShellCompletion:  true,
 		HideHelpCommand:        true,
 		Commands: []*cli.Command{
 			commands.Show,
 			commands.Prune,
+			commands.Remove,
 		},
 	}
 

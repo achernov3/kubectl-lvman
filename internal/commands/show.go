@@ -11,7 +11,7 @@ var (
 	Show = &cli.Command{
 		Name:    config.CmdShow,
 		Aliases: []string{config.CmdShowShort},
-		Usage:   "",
+		Usage:   "shows disk usage by provided pvc names and oprhaned logical volumes in cluster",
 		Commands: []*cli.Command{
 			subcmd.DF,
 			subcmd.Orphan,
