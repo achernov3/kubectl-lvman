@@ -1,13 +1,14 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"kubectl-lvman/internal/config"
 	"kubectl-lvman/internal/k8s"
 	"kubectl-lvman/internal/table"
 	"slices"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var (
@@ -20,12 +21,12 @@ var (
 	}
 )
 
-func showOrphan(clictx *cli.Context) error {
+func showOrphan(ctx context.Context, cmd *cli.Command) error {
 	var pvs []string
 	var tableData [][]string
 	tableRender := table.GetTableRender()
 
-	cfg, err := config.NewConfig(clictx)
+	cfg, err := config.NewConfig(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("can't get *Config: %w", err)
 	}
@@ -35,12 +36,12 @@ func showOrphan(clictx *cli.Context) error {
 		return fmt.Errorf("can't get *Client: %w", err)
 	}
 
-	lvList, err := client.ListLV(clictx.Context)
+	lvList, err := client.ListLV(ctx)
 	if err != nil {
 		return fmt.Errorf("can't get resource LogicalVolumeList: %w", err)
 	}
 
-	pvList, err := client.ListPV(clictx.Context)
+	pvList, err := client.ListPV(ctx)
 	if err != nil {
 		return fmt.Errorf("can't get resource PersistentVolumeList: %w", err)
 	}
@@ -55,10 +56,13 @@ func showOrphan(clictx *cli.Context) error {
 		if !slices.Contains(pvs, lvName) {
 			tableData = append(tableData, []string{lvName, lv.Spec.NodeName, lv.Status.VolumeID})
 		}
-
 	}
 
-	tableRender.RenderTable(tableData, []string{"LogicalVolume", "NODE", "VOLUME ID"})
+	if len(tableData) == 0 {
+		fmt.Println("There's no oprhaned logical volumes")
+	} else {
+		tableRender.RenderTable(tableData, []string{"LogicalVolume", "NODE", "VOLUME ID"})
+	}
 
 	return nil
 

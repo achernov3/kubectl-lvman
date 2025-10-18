@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"kubectl-lvman/internal/config"
 	diskfree "kubectl-lvman/internal/disk_free"
@@ -8,26 +9,32 @@ import (
 	sshclient "kubectl-lvman/internal/ssh_client"
 	"kubectl-lvman/internal/table"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	v1 "k8s.io/api/core/v1"
 )
 
 var (
 	diskFree = &cli.Command{
-		Name:   config.CmdDF,
-		Usage:  "prints disk usage to stdout and other info about pvc, pv, lv",
-		Flags:  config.ShowFlags,
+		Name:  config.CmdDF,
+		Usage: "prints disk usage to stdout and other info about pvc, pv, lv",
+		Flags: config.ShowFlags,
+		Before: func(ctx context.Context, c *cli.Command) (context.Context, error) {
+			if c.Name == config.CmdDF && len(c.Args().Slice()) == 0 {
+				return nil, fmt.Errorf("you must specify pvc names!")
+			}
+			return nil, nil
+		},
 		Action: showDiskFree,
 	}
 
 	standardHeader []string = []string{"PVC", "PV", "STATUS", "NODE", "VOLUME ID", "CAPACITY", "USAGE"}
 )
 
-func showDiskFree(clictx *cli.Context) error {
+func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 	var tableData [][]string
 	tableRender := table.GetTableRender()
 
-	cfg, err := config.NewConfig(clictx)
+	cfg, err := config.NewConfig(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("can't get *Config: %w", err)
 	}
@@ -38,12 +45,12 @@ func showDiskFree(clictx *cli.Context) error {
 	}
 
 	for _, pvcName := range cfg.PVCNames {
-		pvc, err := client.GetPVC(cfg.Namespace, pvcName, clictx.Context)
+		pvc, err := client.GetPVC(cfg.Namespace, pvcName, ctx)
 		if err != nil {
 			return fmt.Errorf("can't get resource *PersistentVolumeClaim: %w", err)
 		}
 
-		pv, err := client.GetPV(pvc.Spec.VolumeName, clictx.Context)
+		pv, err := client.GetPV(pvc.Spec.VolumeName, ctx)
 		if err != nil {
 			return fmt.Errorf("can't get resource *PersistentVolume: %w", err)
 		}
@@ -55,7 +62,7 @@ func showDiskFree(clictx *cli.Context) error {
 			return fmt.Errorf("PV %s has no node affinity configuration", pv.Name)
 		}
 
-		node, err := client.GetNode(pv.Spec.NodeAffinity.Required.NodeSelectorTerms[0].MatchExpressions[0].Values[0], clictx.Context)
+		node, err := client.GetNode(pv.Spec.NodeAffinity.Required.NodeSelectorTerms[0].MatchExpressions[0].Values[0], ctx)
 		if err != nil {
 			return fmt.Errorf("can't get resource *Node: %w", err)
 		}

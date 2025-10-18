@@ -62,6 +62,7 @@ require (
 	github.com/olekukonko/tablewriter v1.1.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/topolvm/topolvm v0.38.0
+	github.com/urfave/cli/v3 v3.4.1
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	golang.org/x/crypto v0.43.0
 	k8s.io/api v0.34.1

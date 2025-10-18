@@ -1,9 +1,10 @@
 package config
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"k8s.io/client-go/util/homedir"
 )
 
@@ -34,36 +35,42 @@ var (
 		&cli.StringFlag{
 			Name:        argKubeconfig,
 			Usage:       "kubernetes client config path",
-			EnvVars:     []string{"KUBECONFIG"},
+			Sources:     cli.EnvVars("KUBECONFIG"),
 			Value:       fmt.Sprintf("%s/.kube/config", homedir.HomeDir()),
 			DefaultText: "$HOME/.kube/config",
+			Validator:   validateStringFlagsNonEmpty,
 		},
 		&cli.StringFlag{
-			Name:    argNamespace,
-			Aliases: []string{"n"},
-			Usage:   "override namespace of current context from kubeconfig",
-			Value:   "",
+			Name:      argNamespace,
+			Aliases:   []string{"n"},
+			Usage:     "override namespace of current context from kubeconfig",
+			Value:     "",
+			Validator: validateStringFlagsNonEmpty,
 		},
 		&cli.StringFlag{
-			Name:  argContext,
-			Usage: "override current context from kubeconfig",
-			Value: "",
+			Name:      argContext,
+			Usage:     "override current context from kubeconfig",
+			Validator: validateStringFlagsNonEmpty,
+			Value:     "",
 		},
-		&cli.PathFlag{
+		&cli.StringFlag{
 			Name:        argIdRsa,
 			Usage:       "Path to private ssh key",
 			Value:       fmt.Sprintf("%s/.ssh/id_rsa", homedir.HomeDir()),
+			Validator:   validateStringFlagsNonEmpty,
 			DefaultText: "$HOME/.ssh/id_rsa",
 		},
 		&cli.StringFlag{
-			Name:  argUsername,
-			Usage: "Paste username for ssh to node",
-			Value: "ops",
+			Name:      argUsername,
+			Usage:     "Paste username for ssh to node",
+			Value:     "ops",
+			Validator: validateStringFlagsNonEmpty,
 		},
 		&cli.StringFlag{
-			Name:  argPort,
-			Usage: "Paste port for ssh connection",
-			Value: "22",
+			Name:      argPort,
+			Usage:     "Paste port for ssh connection",
+			Value:     "22",
+			Validator: validateStringFlagsNonEmpty,
 		},
 	}
 
@@ -71,20 +78,23 @@ var (
 		&cli.StringFlag{
 			Name:        argKubeconfig,
 			Usage:       "kubernetes client config path",
-			EnvVars:     []string{"KUBECONFIG"},
+			Sources:     cli.EnvVars("KUBECONFIG"),
 			Value:       fmt.Sprintf("%s/.kube/config", homedir.HomeDir()),
+			Validator:   validateStringFlagsNonEmpty,
 			DefaultText: "$HOME/.kube/config",
 		},
 		&cli.StringFlag{
-			Name:    argNamespace,
-			Aliases: []string{"n"},
-			Usage:   "override namespace of current context from kubeconfig",
-			Value:   "",
+			Name:      argNamespace,
+			Aliases:   []string{"n"},
+			Usage:     "override namespace of current context from kubeconfig",
+			Value:     "",
+			Validator: validateStringFlagsNonEmpty,
 		},
 		&cli.StringFlag{
-			Name:  argContext,
-			Usage: "override current context from kubeconfig",
-			Value: "",
+			Name:      argContext,
+			Usage:     "override current context from kubeconfig",
+			Value:     "",
+			Validator: validateStringFlagsNonEmpty,
 		},
 		&cli.BoolFlag{
 			Name:    ArgFormat,
@@ -106,50 +116,21 @@ type Config struct {
 	Port        string
 }
 
-func NewConfig(clictx *cli.Context) (*Config, error) {
-	pvcName := clictx.Args().Slice()
-	if clictx.Command.Name == CmdDF {
-		if len(pvcName) == 0 {
-			return nil, errorWithCliHelp(clictx, "you must specify pvc name!")
-		}
-	}
-
-	err := validateStringFlagsNonEmpty(clictx, stringFlags)
-	if err != nil {
-		return nil, err
-	}
-
+func NewConfig(ctx context.Context, cmd *cli.Command) (*Config, error) {
 	return &Config{
-		KubeConfig:  clictx.String(argKubeconfig),
-		Namespace:   clictx.String(argNamespace),
-		KubeContext: clictx.String(argContext),
-		PVCNames:    pvcName,
-		SSHKey:      clictx.Path(argIdRsa),
-		Username:    clictx.String(argUsername),
-		Port:        clictx.String(argPort),
+		KubeConfig:  cmd.String(argKubeconfig),
+		Namespace:   cmd.String(argNamespace),
+		KubeContext: cmd.String(argContext),
+		PVCNames:    cmd.Args().Slice(),
+		SSHKey:      cmd.String(argIdRsa),
+		Username:    cmd.String(argUsername),
+		Port:        cmd.String(argPort),
 	}, nil
 }
 
-func errorWithCliHelp(clictx *cli.Context, a any) error {
-	err := cli.ShowAppHelp(clictx)
-	if err != nil {
-		return err
-	}
-	//nolint:staticcheck
-	return fmt.Errorf("%s\n", a)
-}
-
-func errorWithCliHelpf(clictx *cli.Context, format string, a ...any) error {
-	return errorWithCliHelp(clictx, fmt.Sprintf(format, a...))
-}
-
-func validateStringFlagsNonEmpty(clictx *cli.Context, flags []string) error {
-	for _, flag := range flags {
-		if clictx.IsSet(flag) {
-			if clictx.String(flag) == "" {
-				return errorWithCliHelpf(clictx, "option --%s must not be empty", flag)
-			}
-		}
+func validateStringFlagsNonEmpty(s string) error {
+	if s == "" {
+		return fmt.Errorf("option --%s must not be empty", s)
 	}
 	return nil
 }

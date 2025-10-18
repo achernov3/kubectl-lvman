@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"kubectl-lvman/internal/commands"
 	"os"
 	"time"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var Version = "local"
@@ -14,27 +15,14 @@ var Version = "local"
 const appName = "kubectl-lvman"
 
 func main() {
-	app := &cli.App{
-		Name:     appName,
-		Version:  Version,
-		Compiled: time.Now(),
-		Authors: []*cli.Author{
-			{
-				Name: "anon",
-			},
-		},
-		HelpName: appName,
-		Usage:    "kubectl plugin for managing logical volumes in a cluster",
-		UsageText: fmt.Sprintf(`%s [flags] [command]
-
-		Example:
-		
-		%s show --username admin --port 2221 --id_rsa ~/.ssh/admin/id_rsa show df <pvc-names>
-
-		%s show orphan
-		`, appName, appName, appName),
+	app := &cli.Command{
+		Name:                   appName,
+		Version:                Version,
+		Metadata:               map[string]interface{}{"Compiled:": time.Now()},
+		Usage:                  "kubectl plugin for managing logical volumes in a kubernetes cluster with topolvm as storage class",
+		UsageText:              fmt.Sprintf(`%s [flags] [command]`, appName),
 		UseShortOptionHandling: true,
-		EnableBashCompletion:   true,
+		EnableShellCompletion:  true,
 		HideHelpCommand:        true,
 		Commands: []*cli.Command{
 			commands.Show,
@@ -42,7 +30,7 @@ func main() {
 		},
 	}
 
-	err := app.Run(os.Args)
+	err := app.Run(context.Background(), os.Args)
 	if err != nil {
 		fmt.Printf("%+v: %+v", os.Args[0], err)
 	}
