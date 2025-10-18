@@ -1,4 +1,4 @@
-package commands
+package subcmd
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	orphan = &cli.Command{
+	Orphan = &cli.Command{
 		Name:    config.CmdOrphan,
 		Aliases: []string{config.CmdOrphanShort},
 		Usage:   "prints oprhaned logical volumes and the nodes on which they are located",
@@ -61,7 +61,7 @@ func showOrphan(ctx context.Context, cmd *cli.Command) error {
 	if len(tableData) == 0 {
 		fmt.Println("There's no oprhaned logical volumes")
 	} else {
-		tableRender.RenderTable(tableData, []string{"LogicalVolume", "NODE", "VOLUME ID"})
+		tableRender.RenderTable(tableData, config.ShowOrphanHeaders)
 	}
 
 	return nil

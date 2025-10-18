@@ -2,6 +2,7 @@ package commands
 
 import (
 	"kubectl-lvman/internal/config"
+	"kubectl-lvman/internal/subcmd"
 
 	"github.com/urfave/cli/v3"
 )
@@ -12,8 +13,8 @@ var (
 		Aliases: []string{config.CmdShowShort},
 		Usage:   "",
 		Commands: []*cli.Command{
-			diskFree,
-			orphan,
+			subcmd.DF,
+			subcmd.Orphan,
 		},
 	}
 )

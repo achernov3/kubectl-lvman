@@ -31,14 +31,19 @@ const (
 )
 
 var (
+	ShowOrphanHeaders = []string{"LOGICAL VOLUME", "NODE", "VOLUME ID"}
+	StandardHeader    = []string{"PVC", "PV", "STATUS", "NODE", "VOLUME ID", "CAPACITY", "USAGE"}
+)
+
+var (
 	ShowFlags = []cli.Flag{
 		&cli.StringFlag{
 			Name:        argKubeconfig,
 			Usage:       "kubernetes client config path",
 			Sources:     cli.EnvVars("KUBECONFIG"),
 			Value:       fmt.Sprintf("%s/.kube/config", homedir.HomeDir()),
-			DefaultText: "$HOME/.kube/config",
 			Validator:   validateStringFlagsNonEmpty,
+			DefaultText: "$HOME/.kube/config",
 		},
 		&cli.StringFlag{
 			Name:      argNamespace,
@@ -50,8 +55,8 @@ var (
 		&cli.StringFlag{
 			Name:      argContext,
 			Usage:     "override current context from kubeconfig",
-			Validator: validateStringFlagsNonEmpty,
 			Value:     "",
+			Validator: validateStringFlagsNonEmpty,
 		},
 		&cli.StringFlag{
 			Name:        argIdRsa,
@@ -102,8 +107,6 @@ var (
 			Usage:   "allows show stdout in raw format",
 		},
 	}
-
-	stringFlags = []string{argKubeconfig, argNamespace, argContext}
 )
 
 type Config struct {

@@ -14,22 +14,13 @@ var (
 	Prune = &cli.Command{
 		Name:    config.CmdPrune,
 		Aliases: []string{config.CmdPruneShort},
-		Usage:   "",
-		Commands: []*cli.Command{
-			lost,
-		},
-	}
-
-	lost = &cli.Command{
-		Name:    config.CmdLost,
-		Aliases: []string{config.CmdLostShort},
-		Flags:   config.OrphanFlags,
 		Usage:   "prune all losted LV (which hasn't binded PV)",
-		Action:  rmOrphan,
+		Action:  pruneOrphan,
+		Flags:   config.OrphanFlags,
 	}
 )
 
-func rmOrphan(ctx context.Context, cmd *cli.Command) error {
+func pruneOrphan(ctx context.Context, cmd *cli.Command) error {
 	var pvs []string
 
 	cfg, err := config.NewConfig(ctx, cmd)

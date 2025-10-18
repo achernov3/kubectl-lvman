@@ -1,4 +1,4 @@
-package commands
+package subcmd
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	diskFree = &cli.Command{
+	DF = &cli.Command{
 		Name:  config.CmdDF,
 		Usage: "prints disk usage to stdout and other info about pvc, pv, lv",
 		Flags: config.ShowFlags,
@@ -26,8 +26,6 @@ var (
 		},
 		Action: showDiskFree,
 	}
-
-	standardHeader []string = []string{"PVC", "PV", "STATUS", "NODE", "VOLUME ID", "CAPACITY", "USAGE"}
 )
 
 func showDiskFree(ctx context.Context, cmd *cli.Command) error {
@@ -101,7 +99,7 @@ func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 		tableData = append(tableData, table.MakeColumnsSlice(pvc, pv, node, *df))
 	}
 
-	tableRender.RenderTable(tableData, standardHeader)
+	tableRender.RenderTable(tableData, config.StandardHeader)
 
 	return nil
 }
