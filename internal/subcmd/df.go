@@ -1,4 +1,4 @@
-package commands
+package subcmd
 
 import (
 	"context"
@@ -9,27 +9,38 @@ import (
 	sshclient "kubectl-lvman/internal/ssh_client"
 	"kubectl-lvman/internal/table"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	v1 "k8s.io/api/core/v1"
 )
 
 var (
-	diskFree = &cli.Command{
-		Name:   config.CmdDF,
-		Usage:  "prints disk usage to stdout and other info about pvc, pv, lv",
-		Flags:  config.ShowFlags,
-		Action: showDiskFree,
+	DF = &cli.Command{
+		Name:  config.CmdDF,
+		Usage: "prints disk usage to stdout and other info about pvc, pv, lv",
+		Flags: []cli.Flag{
+			config.KubeConfigFlag[0],
+			config.KubeContextFlag[0],
+			config.KubeNamespaceFlag[0],
+			config.IDRsaFlag[0],
+			config.PortFlag[0],
+			config.UsernameFlag[0],
+		},
+		Before: func(ctx context.Context, c *cli.Command) (context.Context, error) {
+			if c.Name == config.CmdDF && len(c.Args().Slice()) == 0 {
+				return nil, fmt.Errorf("you must specify pvc names!")
+			}
+			return nil, nil
+		},
+		UsageText: fmt.Sprintf(`%s %s %s [flags] [command] <pvc-list>`, config.AppName, config.CmdShow, config.CmdDF),
+		Action:    showDiskFree,
 	}
-
-	standardHeader []string = []string{"PVC", "PV", "STATUS", "NODE", "VOLUME ID", "CAPACITY", "USAGE"}
 )
 
-func showDiskFree(clictx *cli.Context) error {
+func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 	var tableData [][]string
 	tableRender := table.GetTableRender()
-	ctx := context.Background()
 
-	cfg, err := config.NewConfig(clictx)
+	cfg, err := config.NewConfig(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("can't get *Config: %w", err)
 	}
@@ -69,7 +80,7 @@ func showDiskFree(clictx *cli.Context) error {
 			}
 		}
 
-		cmd := fmt.Sprintf(`df -hP | grep "%s" | awk '
+		dfCmd := fmt.Sprintf(`df -hP | grep "%s" | awk '
 			BEGIN {
 			    printf "{\"discarray\":["
 			}
@@ -83,7 +94,7 @@ func showDiskFree(clictx *cli.Context) error {
 			    print "]}"
 			}'`, pv.Spec.CSI.VolumeHandle)
 
-		stdout, err := sshclient.ExecCMD(cfg, cmd, host)
+		stdout, err := sshclient.ExecCMD(cfg, dfCmd, host)
 		if err != nil {
 			return fmt.Errorf("df command exit with non zero: %w", err)
 		}
@@ -96,7 +107,7 @@ func showDiskFree(clictx *cli.Context) error {
 		tableData = append(tableData, table.MakeColumnsSlice(pvc, pv, node, *df))
 	}
 
-	tableRender.RenderTable(tableData, standardHeader)
+	tableRender.RenderTable(tableData, config.StandardHeader)
 
 	return nil
 }

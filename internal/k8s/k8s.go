@@ -3,7 +3,6 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"kubectl-lvman/internal/config"
 
 	// старое деприкейтнутое говно
 
@@ -21,25 +20,28 @@ func (c *Client) GetPVC(namespace, pvcName string, ctx context.Context) (*v1.Per
 
 func (c *Client) GetPV(volumeName string, ctx context.Context) (*v1.PersistentVolume, error) {
 	return c.Clientset.CoreV1().PersistentVolumes().Get(ctx, volumeName, metav1.GetOptions{})
-
-}
-
-func (c *Client) GetNode(nodeName string, ctx context.Context) (*v1.Node, error) {
-	return c.Clientset.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
 }
 
 func (c *Client) ListPV(ctx context.Context) (*v1.PersistentVolumeList, error) {
 	return c.Clientset.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
 }
 
-func (c *Client) GetLV(cfg *config.Config, name string, ctx context.Context) (*topolvmlegacyv1.LogicalVolume, error) {
+func (c *Client) DeletePV(pvName string, ctx context.Context) error {
+	return c.Clientset.CoreV1().PersistentVolumes().Delete(ctx, pvName, metav1.DeleteOptions{})
+}
+
+func (c *Client) GetNode(nodeName string, ctx context.Context) (*v1.Node, error) {
+	return c.Clientset.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
+}
+
+func (c *Client) GetLV(ctx context.Context, lvName string) (*topolvmlegacyv1.LogicalVolume, error) {
 	resourceScheme := topolvmlegacyv1.SchemeBuilder.GroupVersion.WithResource(logicalvolumes)
 
 	LogicalVolumeResource := &topolvmlegacyv1.LogicalVolume{}
 
-	u, err := c.DynamicClient.Resource(resourceScheme).Get(ctx, name, metav1.GetOptions{})
+	u, err := c.DynamicClient.Resource(resourceScheme).Get(context.TODO(), lvName, metav1.GetOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("can't get Unstructured: %w", err)
+		return nil, fmt.Errorf("can't get UnstructuredList: %w", err)
 	}
 
 	unstructured := u.UnstructuredContent()
@@ -49,7 +51,7 @@ func (c *Client) GetLV(cfg *config.Config, name string, ctx context.Context) (*t
 		return nil, fmt.Errorf("failed to convert unstructured to LogicalVolumeResource: %w", err)
 	}
 
-	return LogicalVolumeResource, err
+	return LogicalVolumeResource, nil
 }
 
 func (c *Client) ListLV(ctx context.Context) (*topolvmlegacyv1.LogicalVolumeList, error) {
@@ -70,4 +72,15 @@ func (c *Client) ListLV(ctx context.Context) (*topolvmlegacyv1.LogicalVolumeList
 	}
 
 	return LogicalVolumeListResource, err
+}
+
+func (c *Client) DeleteLV(lvName string, ctx context.Context) error {
+	resourceScheme := topolvmlegacyv1.SchemeBuilder.GroupVersion.WithResource(logicalvolumes)
+
+	err := c.DynamicClient.Resource(resourceScheme).Delete(ctx, lvName, metav1.DeleteOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to delete to LogicalVolumeResource: %w", err)
+	}
+
+	return nil
 }

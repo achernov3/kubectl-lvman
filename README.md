@@ -29,3 +29,10 @@ pvc-02853c06-93fc-42fa-b37b-38ebb1e32a7f  afd1fea-w-053    650b5e08-e16f-48c5-ad
 pvc-0301da0c-052e-4f11-a6ed-9c675b58c7d9  afd1fea-w-053    ec30bf27-713c-4be1-bfe1-994bc98b1cd4 
 pvc-048c5228-ccf5-4eaf-9df2-1dfabe5d629a  afd1fea-w-053    c2681c40-7da2-471d-8e92-40837730def6 
 ```
+
+## TODO:
+  - [x] bump urfave/cli to v3;
+  - [x] refactor commands;
+  - [x] add command that remove pvc -> pv -> lv;
+  - [ ] impliment `HostKeyCallback`;
+  - [ ] add validate LV version.

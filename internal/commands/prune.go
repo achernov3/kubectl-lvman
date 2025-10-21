@@ -5,29 +5,29 @@ import (
 	"fmt"
 	"kubectl-lvman/internal/config"
 	"kubectl-lvman/internal/k8s"
-	"kubectl-lvman/internal/table"
 	"slices"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var (
-	orphan = &cli.Command{
-		Name:    config.CmdOrphan,
-		Aliases: []string{"o"},
-		Usage:   "prints oprhaned logical volumes and the nodes on which they are located",
-		Flags:   config.OrphanFlags,
-		Action:  showOrphan,
+	Prune = &cli.Command{
+		Name:    config.CmdPrune,
+		Aliases: []string{config.CmdPruneShort},
+		Usage:   "prune all oprhaned LV (which hasn't binded PV)",
+		Action:  pruneOrphan,
+		Flags: []cli.Flag{
+			config.KubeConfigFlag[0],
+			config.KubeContextFlag[0],
+			config.KubeNamespaceFlag[0],
+		},
 	}
 )
 
-func showOrphan(clictx *cli.Context) error {
+func pruneOrphan(ctx context.Context, cmd *cli.Command) error {
 	var pvs []string
-	var tableData [][]string
-	tableRender := table.GetTableRender()
-	ctx := context.Background()
 
-	cfg, err := config.NewConfig(clictx)
+	cfg, err := config.NewConfig(ctx, cmd)
 	if err != nil {
 		return fmt.Errorf("can't get *Config: %w", err)
 	}
@@ -55,13 +55,12 @@ func showOrphan(clictx *cli.Context) error {
 		lvName := lv.GetName()
 
 		if !slices.Contains(pvs, lvName) {
-			tableData = append(tableData, []string{lvName, lv.Spec.NodeName, lv.Status.VolumeID})
+			err = client.DeleteLV(lvName, ctx)
+			if err != nil {
+				return fmt.Errorf("failed to delete LogicalVolume %v: %w", lvName, err)
+			}
 		}
-
 	}
 
-	tableRender.RenderTable(tableData, []string{"LogicalVolume", "NODE", "VOLUME ID"})
-
 	return nil
-
 }
