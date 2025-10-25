@@ -31,12 +31,6 @@ jobs:
         with:
           args: --timeout=3m
 
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          version: v2.9.0
-          install-only: true
-
       - name: Verify build
         shell: bash
         run: |
