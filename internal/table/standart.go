@@ -30,13 +30,13 @@ func (s Standart) RenderTable(data [][]string, header []string) error {
 	for _, v := range data {
 		err := table.Append(v)
 		if err != nil {
-			return fmt.Errorf("failed to append data: %w")
+			return fmt.Errorf("failed to append data: %w", err)
 		}
 	}
 
 	err := table.Render()
 	if err != nil {
-		return fmt.Errorf("failed to render table: %w")
+		return fmt.Errorf("failed to render table: %w", err)
 	}
 
 	return nil

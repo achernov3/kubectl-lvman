@@ -3,6 +3,7 @@ package sshclient
 import (
 	"fmt"
 	"kubectl-lvman/internal/config"
+	"log"
 	"net"
 	"os"
 
@@ -35,11 +36,10 @@ func ExecCMD(cfg *config.Config, cmd, host string) ([]byte, error) {
 		return nil, fmt.Errorf("SSH dial failed: %w", err)
 	}
 
-	defer func() error {
+	defer func() {
 		if err := client.Close(); err != nil {
-			return fmt.Errorf("failed to close client connection: %w", err)
+			log.Fatalf("failed to close client connection: %w", err)
 		}
-		return nil
 	}()
 
 	session, err := client.NewSession()
@@ -47,11 +47,10 @@ func ExecCMD(cfg *config.Config, cmd, host string) ([]byte, error) {
 		return nil, fmt.Errorf("creating session: %w", err)
 	}
 
-	defer func() error {
+	defer func() {
 		if err := session.Close(); err != nil {
-			return fmt.Errorf("failed to close ssh session: %w", err)
+			log.Fatalf("failed to close ssh session: %w", err)
 		}
-		return nil
 	}()
 
 	stdoutBytes, err := session.CombinedOutput(cmd)

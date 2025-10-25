@@ -107,7 +107,10 @@ func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 		tableData = append(tableData, table.MakeColumnsSlice(pvc, pv, node, *df))
 	}
 
-	tableRender.RenderTable(tableData, config.StandardHeader)
+	err = tableRender.RenderTable(tableData, config.StandardHeader)
+	if err != nil {
+		return fmt.Errorf("failed to render table: %w")
+	}
 
 	return nil
 }
