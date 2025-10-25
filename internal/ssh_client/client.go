@@ -38,7 +38,7 @@ func ExecCMD(cfg *config.Config, cmd, host string) ([]byte, error) {
 
 	defer func() {
 		if err := client.Close(); err != nil {
-			log.Fatalf("failed to close client connection: %w", err)
+			log.Fatalf("failed to close client connection: %v", err)
 		}
 	}()
 
@@ -49,7 +49,7 @@ func ExecCMD(cfg *config.Config, cmd, host string) ([]byte, error) {
 
 	defer func() {
 		if err := session.Close(); err != nil {
-			log.Fatalf("failed to close ssh session: %w", err)
+			log.Fatalf("failed to close ssh session: %v", err)
 		}
 	}()
 

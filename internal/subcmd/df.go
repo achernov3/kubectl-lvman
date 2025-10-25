@@ -109,7 +109,7 @@ func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 
 	err = tableRender.RenderTable(tableData, config.StandardHeader)
 	if err != nil {
-		return fmt.Errorf("failed to render table: %w")
+		return fmt.Errorf("failed to render table: %w", err)
 	}
 
 	return nil

@@ -68,7 +68,7 @@ func showOrphan(ctx context.Context, cmd *cli.Command) error {
 	} else {
 		err := tableRender.RenderTable(tableData, config.ShowOrphanHeaders)
 		if err != nil {
-			return fmt.Errorf("failed to render table: %w")
+			return fmt.Errorf("failed to render table: %w", err)
 		}
 	}
 
