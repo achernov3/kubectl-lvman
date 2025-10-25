@@ -35,20 +35,24 @@ func ExecCMD(cfg *config.Config, cmd, host string) ([]byte, error) {
 		return nil, fmt.Errorf("SSH dial failed: %w", err)
 	}
 
-	defer func() {
+	defer func() error {
 		if err := client.Close(); err != nil {
-			fmt.Errorf("closing ssg session: %w", err)
+			return fmt.Errorf("failed to close client connection: %w", err)
 		}
+		return nil
 	}()
-
-	defer client.Close()
 
 	session, err := client.NewSession()
 	if err != nil {
 		return nil, fmt.Errorf("creating session: %w", err)
 	}
 
-	defer session.Close()
+	defer func() error {
+		if err := session.Close(); err != nil {
+			return fmt.Errorf("failed to close ssh session: %w", err)
+		}
+		return nil
+	}()
 
 	stdoutBytes, err := session.CombinedOutput(cmd)
 	if err != nil {

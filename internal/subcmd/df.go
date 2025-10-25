@@ -27,7 +27,7 @@ var (
 		},
 		Before: func(ctx context.Context, c *cli.Command) (context.Context, error) {
 			if c.Name == config.CmdDF && len(c.Args().Slice()) == 0 {
-				return nil, fmt.Errorf("you must specify pvc names!")
+				return nil, fmt.Errorf("you must specify pvc names")
 			}
 			return nil, nil
 		},
