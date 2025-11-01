@@ -57,7 +57,7 @@ require (
 require (
 	github.com/olekukonko/tablewriter v1.1.0
 	github.com/topolvm/topolvm v0.38.0
-	github.com/urfave/cli/v3 v3.4.1
+	github.com/urfave/cli/v3 v3.5.0
 	golang.org/x/crypto v0.43.0
 	k8s.io/api v0.34.1
 	k8s.io/client-go v0.34.1
