@@ -17,7 +17,7 @@ var (
 		UsageText: fmt.Sprintf(`%s %s [flags] [command] <pvc-list>`, config.AppName, config.CmdRemove),
 		Before: func(ctx context.Context, c *cli.Command) (context.Context, error) {
 			if c.Name == config.CmdRemove && len(c.Args().Slice()) == 0 {
-				return nil, fmt.Errorf("you must specify pvc names!")
+				return nil, fmt.Errorf("you must specify pvc names")
 			}
 			return nil, nil
 		},
