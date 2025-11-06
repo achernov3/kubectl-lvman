@@ -11,6 +11,7 @@ import (
 
 	"github.com/urfave/cli/v3"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/component-helpers/storage/volume"
 )
 
 var (
@@ -61,14 +62,12 @@ func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 			return fmt.Errorf("can't get resource *PersistentVolume: %w", err)
 		}
 
-		if pv.Spec.NodeAffinity == nil ||
-			pv.Spec.NodeAffinity.Required == nil ||
-			len(pv.Spec.NodeAffinity.Required.NodeSelectorTerms) == 0 ||
-			len(pv.Spec.NodeAffinity.Required.NodeSelectorTerms[0].MatchExpressions) == 0 {
-			return fmt.Errorf("PV %s has no node affinity configuration", pv.Name)
+		nodeName, ok := pvc.Annotations[volume.AnnSelectedNode]
+		if !ok {
+			fmt.Errorf("annotation %v not set: %w", volume.AnnSelectedNode, err)
 		}
 
-		node, err := client.GetNode(pv.Spec.NodeAffinity.Required.NodeSelectorTerms[0].MatchExpressions[0].Values[0], ctx)
+		node, err := client.GetNode(nodeName, ctx)
 		if err != nil {
 			return fmt.Errorf("can't get resource *Node: %w", err)
 		}
