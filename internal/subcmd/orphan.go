@@ -66,7 +66,10 @@ func showOrphan(ctx context.Context, cmd *cli.Command) error {
 	if len(tableData) == 0 {
 		fmt.Println("There's no oprhaned logical volumes")
 	} else {
-		tableRender.RenderTable(tableData, config.ShowOrphanHeaders)
+		err := tableRender.RenderTable(tableData, config.ShowOrphanHeaders)
+		if err != nil {
+			return fmt.Errorf("failed to render table: %w", err)
+		}
 	}
 
 	return nil

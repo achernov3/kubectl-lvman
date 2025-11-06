@@ -28,7 +28,7 @@ var (
 		},
 		Before: func(ctx context.Context, c *cli.Command) (context.Context, error) {
 			if c.Name == config.CmdDF && len(c.Args().Slice()) == 0 {
-				return nil, fmt.Errorf("you must specify pvc names!")
+				return nil, fmt.Errorf("you must specify pvc names")
 			}
 			return nil, nil
 		},
@@ -106,7 +106,10 @@ func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 		tableData = append(tableData, table.MakeColumnsSlice(pvc, pv, node, *df))
 	}
 
-	tableRender.RenderTable(tableData, config.StandardHeader)
+	err = tableRender.RenderTable(tableData, config.StandardHeader)
+	if err != nil {
+		return fmt.Errorf("failed to render table: %w", err)
+	}
 
 	return nil
 }

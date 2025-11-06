@@ -68,6 +68,9 @@ func getDynamicClient(cfg *config.Config) (*dynamic.DynamicClient, error) {
 		})
 
 	clientConfig, err := config.ClientConfig()
+	if err != nil {
+		return nil, fmt.Errorf("can't get client config: %w", err)
+	}
 
 	dynamicClient, err := dynamic.NewForConfig(clientConfig)
 	if err != nil {

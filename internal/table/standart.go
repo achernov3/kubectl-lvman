@@ -1,6 +1,7 @@
 package table
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
@@ -14,7 +15,7 @@ func NewStandart() ITable {
 	return Standart{}
 }
 
-func (s Standart) RenderTable(data [][]string, header []string) {
+func (s Standart) RenderTable(data [][]string, header []string) error {
 	border := tw.BorderNone
 	settings := tw.Settings{
 		Separators: tw.SeparatorsNone,
@@ -27,7 +28,16 @@ func (s Standart) RenderTable(data [][]string, header []string) {
 	table.Renderer()
 
 	for _, v := range data {
-		table.Append(v)
+		err := table.Append(v)
+		if err != nil {
+			return fmt.Errorf("failed to append data: %w", err)
+		}
 	}
-	table.Render()
+
+	err := table.Render()
+	if err != nil {
+		return fmt.Errorf("failed to render table: %w", err)
+	}
+
+	return nil
 }
