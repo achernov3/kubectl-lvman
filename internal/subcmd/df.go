@@ -64,7 +64,7 @@ func showDiskFree(ctx context.Context, cmd *cli.Command) error {
 
 		nodeName, ok := pvc.Annotations[volume.AnnSelectedNode]
 		if !ok {
-			fmt.Errorf("annotation %v not set: %w", volume.AnnSelectedNode, err)
+			return fmt.Errorf("annotation %v not set: %w", volume.AnnSelectedNode, err)
 		}
 
 		node, err := client.GetNode(nodeName, ctx)
