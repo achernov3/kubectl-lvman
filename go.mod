@@ -2,7 +2,7 @@ module kubectl-lvman
 
 go 1.24.0
 
-require k8s.io/apimachinery v0.34.1
+require k8s.io/apimachinery v0.34.2
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -59,6 +59,6 @@ require (
 	github.com/topolvm/topolvm v0.38.0
 	github.com/urfave/cli/v3 v3.4.1
 	golang.org/x/crypto v0.43.0
-	k8s.io/api v0.34.1
-	k8s.io/client-go v0.34.1
+	k8s.io/api v0.34.2
+	k8s.io/client-go v0.34.2
 )
