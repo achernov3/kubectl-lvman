@@ -1,9 +1,5 @@
 # kubectl-lvman
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/yourrepo/kubectl-lvman)](https://goreportcard.com/report/github.com/yourrepo/kubectl-lvman)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/yourrepo/kubectl-lvman)](https://golang.org/)
-
 A kubectl plugin for managing TopoLVM logical volumes in Kubernetes clusters.
 
 ## Features
@@ -211,7 +207,3 @@ kubectl lvman show df -n production my-app-data-0 my-app-data-1
 ```bash
 kubectl lvman remove -n default test-pvc-001
 ```
-
-## License
-
-MIT
