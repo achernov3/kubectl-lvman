@@ -47,11 +47,7 @@ func ExecCMD(cfg *config.Config, cmd, host string) ([]byte, error) {
 		return nil, fmt.Errorf("creating session: %w", err)
 	}
 
-	defer func() {
-		if err := session.Close(); err != nil {
-			log.Fatalf("failed to close ssh session: %v", err)
-		}
-	}()
+	defer session.Close() //nolint
 
 	stdoutBytes, err := session.CombinedOutput(cmd)
 	if err != nil {
